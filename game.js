@@ -89,8 +89,9 @@ class Engine {
 
   render() {
     // Adjust hint box sizes based on grid size
-    const hintMinHeight = this.size >= 20 ? '25px' : (this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px'));
-    const hintMinWidth = this.size >= 20 ? '25px' : (this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px'));
+    const hintMinHeight = this.size >= 20 ? '22px' : (this.size >= 15 ? '26px' : (this.size >= 10 ? '32px' : '38px'));
+    const hintMinWidth = this.size >= 20 ? '22px' : (this.size >= 15 ? '26px' : (this.size >= 10 ? '32px' : '38px'));
+    const hintFontSize = this.size >= 20 ? '0.45rem' : (this.size >= 15 ? '0.5rem' : (this.size >= 10 ? '0.6rem' : '0.7rem'));
     
     // Render Top Hints
     this.els.hTop.innerHTML = "";
@@ -100,6 +101,7 @@ class Engine {
       const div = document.createElement('div');
       div.className = 'hint-box top';
       div.style.minHeight = hintMinHeight;
+      div.style.fontSize = hintFontSize;
       div.innerHTML = this.getHints(col).join('<br>');
       this.els.hTop.appendChild(div);
     }
@@ -112,6 +114,7 @@ class Engine {
       const div = document.createElement('div');
       div.className = 'hint-box left';
       div.style.minWidth = hintMinWidth;
+      div.style.fontSize = hintFontSize;
       div.textContent = this.getHints(this.solution[r]).join(' ');
       this.els.hLeft.appendChild(div);
     }
