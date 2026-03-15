@@ -55,24 +55,7 @@ class Engine {
   }
 
   generatePuzzle() {
-    let attempts = 0;
-    const maxAttempts = this.size >= 20 ? 50 : 100;
-    
-    while (attempts < maxAttempts) {
-      attempts++;
-      // Generate random grid
-      const grid = Array.from({length: this.size}, () => 
-        Array.from({length: this.size}, () => Math.random() > 0.45 ? 1 : 0)
-      );
-      
-      // Check if solution is unique
-      const solver = new PuzzleSolver(grid);
-      if (solver.countSolutions(2) === 1) {
-        return grid;
-      }
-    }
-    
-    // Fallback: return last generated grid
+    // Generate random grid with balanced density
     return Array.from({length: this.size}, () => 
       Array.from({length: this.size}, () => Math.random() > 0.45 ? 1 : 0)
     );
