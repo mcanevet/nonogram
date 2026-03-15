@@ -99,7 +99,7 @@ class Engine {
     
     // Render Top Hints
     this.els.hTop.innerHTML = "";
-    this.els.hTop.style.gap = this.size >= 15 ? '0' : '1px';
+    this.els.hTop.style.gap = '1px';
     for(let c=0; c<this.size; c++) {
       const col = this.solution.map(row => row[c]);
       const div = document.createElement('div');
@@ -111,7 +111,7 @@ class Engine {
 
     // Render Left Hints
     this.els.hLeft.style.gridTemplateRows = `repeat(${this.size}, 1fr)`;
-    this.els.hLeft.style.gap = this.size >= 15 ? '0' : '1px';
+    this.els.hLeft.style.gap = '1px';
     this.els.hLeft.innerHTML = "";
     for(let r=0; r<this.size; r++) {
       const div = document.createElement('div');
