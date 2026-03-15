@@ -173,6 +173,11 @@ class Engine {
     // Only allow input on empty cells
     if (current !== 0) return;
 
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+
     if (this.mode === 'fill') {
       if (correct === 1) {
         // Correct: fill the cell
