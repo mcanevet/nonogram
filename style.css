@@ -44,6 +44,11 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
   font-size: 0.9rem;
 }
 
+#mistakes {
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+}
+
 .diff-controls {
   display: flex;
   gap: 8px;
@@ -107,31 +112,25 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
 .hint-box {
   background: var(--surface);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   font-size: clamp(0.35rem, 1.8vw, 0.7rem);
   font-weight: bold;
   color: #999;
   box-sizing: border-box;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .hint-box.top { 
   flex-direction: column; 
   min-height: 35px; 
-  padding: 1px 0; 
-  justify-content: flex-end;
+  padding: 2px 2px; 
 }
 .hint-box.left { 
   flex-direction: row; 
   min-width: 35px; 
-  justify-content: flex-end; 
-  padding-right: 3px; 
-  gap: 2px; 
-}
-
-.hint-box .hint-num {
-  display: inline-block;
+  padding: 0 4px;
+  gap: 2px;
 }
 
 .hint-box.complete {
