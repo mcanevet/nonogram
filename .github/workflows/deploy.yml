@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  pull-requests: write
+
+concurrency:
+  group: "pages-${{ github.event.pull_request.number || 'main' }}"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect deployment context
+        id: context
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "url=/nonogram-pr-${{ github.event.pull_request.number }}/" >> $GITHUB_OUTPUT
+          else
+            echo "url=/nonogram/" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update start_url for preview
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            sed -i 's|"start_url": "[^"]*"|"start_url": "/nonogram-pr-${{ github.event.pull_request.number }}/"|' manifest.json
+          else
+            sed -i 's|"start_url": "[^"]*"|"start_url": "/nonogram/"|' manifest.json
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          folder: .
+          branch: gh-pages
+          target-folder: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
+          clean: false
+          commit-message: "Deploy ${{ github.ref }}"
+          single-commit: false
+
+      - name: Comment PR with preview URL
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          COMMENT_BODY="## Preview URL https://mcanevet.github.io/nonogram/pr-${{ github.event.pull_request.number }}/"
+          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_BODY"
