@@ -42,14 +42,18 @@
   </div>
 
   <div class="controls-footer">
-    <div class="mode-switch">
-      <button id="modeFill" class="mode-btn active">FILL</button>
-      <button id="modeCross" class="mode-btn">CROSS</button>
-    </div>
+    <button id="modeToggle" class="mode-toggle">
+      <span class="mode-icon">●</span>
+      <span class="mode-label">FILL</span>
+    </button>
     <div class="options">
       <label class="option">
         <input type="checkbox" id="autoCross" checked>
         <span>Auto-cross</span>
+      </label>
+      <label class="option">
+        <input type="checkbox" id="highlightComplete" checked>
+        <span>Highlight complete</span>
       </label>
       <label class="option">
         <input type="checkbox" id="showCorrect" checked>

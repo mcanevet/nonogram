@@ -103,26 +103,42 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
 .hint-box {
   background: var(--surface);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  font-size: clamp(0.5rem, 2.5vw, 0.75rem);
+  font-size: clamp(0.35rem, 1.8vw, 0.7rem);
   font-weight: bold;
   color: #999;
   box-sizing: border-box;
+  line-height: 1.1;
 }
 
 .hint-box.top { 
   flex-direction: column; 
-  min-height: 50px; 
-  padding: 2px 0; 
+  min-height: 35px; 
+  padding: 1px 0; 
   justify-content: flex-end;
 }
 .hint-box.left { 
   flex-direction: row; 
-  min-width: 50px; 
+  min-width: 35px; 
   justify-content: flex-end; 
-  padding-right: 6px; 
-  gap: 4px; 
+  padding-right: 3px; 
+  gap: 2px; 
+}
+
+.hint-box .hint-num {
+  display: inline-block;
+}
+
+.hint-box.complete {
+  color: #4caf50;
+}
+
+.hint-box.complete.top {
+  color: #4caf50;
+}
+.hint-box.complete.left {
+  color: #4caf50;
 }
 
 .grid {
@@ -191,16 +207,34 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.mode-switch { display: flex; gap: 10px; }
-.mode-btn { 
-  flex: 1; padding: 15px; border-radius: 12px; border: none;
-  background: var(--surface); color: white; font-weight: bold;
-  opacity: 0.5; font-size: 1rem;
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 30px;
+  border-radius: 12px;
+  border: none;
+  background: var(--surface);
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
-.mode-btn.active { 
-    opacity: 1; 
-    background: var(--accent); 
-    box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
+
+.mode-toggle .mode-icon {
+  font-size: 1.3rem;
+}
+
+.mode-toggle.fill {
+  background: var(--filled);
+  box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
+}
+
+.mode-toggle.cross {
+  background: var(--crossed);
+  box-shadow: 0 0 15px rgba(100, 100, 150, 0.4);
 }
 
 .options {

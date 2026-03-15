@@ -10,6 +10,9 @@ class Engine {
     this.timerInt = null;
     this.autoCross = false;
     this.showCorrect = false;
+    this.highlightComplete = false;
+    this.completedRows = new Set();
+    this.completedCols = new Set();
 
     this.els = {
       grid: document.getElementById('grid'),
@@ -22,25 +25,43 @@ class Engine {
     };
 
     document.getElementById('newGame').onclick = () => this.init();
-    document.getElementById('modeFill').onclick = () => this.setMode('fill');
-    document.getElementById('modeCross').onclick = () => this.setMode('cross');
+    document.getElementById('modeToggle').onclick = () => this.toggleMode();
     document.getElementById('autoCross').onchange = (e) => this.autoCross = e.target.checked;
     document.getElementById('showCorrect').onchange = (e) => this.showCorrect = e.target.checked;
+    document.getElementById('highlightComplete').onchange = (e) => this.highlightComplete = e.target.checked;
     this.autoCross = document.getElementById('autoCross').checked;
     this.showCorrect = document.getElementById('showCorrect').checked;
+    this.highlightComplete = document.getElementById('highlightComplete').checked;
     
     this.init();
   }
 
-  setMode(m) {
-    this.mode = m;
-    document.getElementById('modeFill').classList.toggle('active', m === 'fill');
-    document.getElementById('modeCross').classList.toggle('active', m === 'cross');
+  toggleMode() {
+    this.mode = this.mode === 'fill' ? 'cross' : 'fill';
+    this.updateModeButton();
+  }
+
+  updateModeButton() {
+    const btn = document.getElementById('modeToggle');
+    const icon = btn.querySelector('.mode-icon');
+    const label = btn.querySelector('.mode-label');
+    
+    if (this.mode === 'fill') {
+      btn.className = 'mode-toggle fill';
+      icon.textContent = '●';
+      label.textContent = 'FILL';
+    } else {
+      btn.className = 'mode-toggle cross';
+      icon.textContent = '✕';
+      label.textContent = 'CROSS';
+    }
   }
 
   init() {
     clearInterval(this.timerInt);
     this.size = parseInt(this.els.diff.value);
+    this.completedRows = new Set();
+    this.completedCols = new Set();
     
     // Generate solution with balanced density
     this.solution = Array.from({length: this.size}, () => 
@@ -55,6 +76,7 @@ class Engine {
     this.els.msg.className = "message";
     
     this.render();
+    this.updateModeButton();
     this.startTimer();
     this.updateStats();
   }
@@ -67,26 +89,34 @@ class Engine {
       else if (count > 0) { hints.push(count); count = 0; }
     });
     if (count > 0) hints.push(count);
-    return hints.length ? hints : [0];
+    return hints;
   }
 
   render() {
+    // Adjust hint box sizes based on grid size
+    const hintMinHeight = this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px');
+    const hintMinWidth = this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px');
+    
     // Render Top Hints
     this.els.hTop.innerHTML = "";
+    this.els.hTop.style.gap = this.size >= 15 ? '0' : '1px';
     for(let c=0; c<this.size; c++) {
       const col = this.solution.map(row => row[c]);
       const div = document.createElement('div');
       div.className = 'hint-box top';
+      div.style.minHeight = hintMinHeight;
       div.innerHTML = this.getHints(col).join('<br>');
       this.els.hTop.appendChild(div);
     }
 
     // Render Left Hints
     this.els.hLeft.style.gridTemplateRows = `repeat(${this.size}, 1fr)`;
+    this.els.hLeft.style.gap = this.size >= 15 ? '0' : '1px';
     this.els.hLeft.innerHTML = "";
     for(let r=0; r<this.size; r++) {
       const div = document.createElement('div');
       div.className = 'hint-box left';
+      div.style.minWidth = hintMinWidth;
       div.textContent = this.getHints(this.solution[r]).join(' ');
       this.els.hLeft.appendChild(div);
     }
@@ -147,6 +177,7 @@ class Engine {
         this.playerBoard[r][c] = 1;
         this.updateCellUI(r, c);
         if (this.autoCross) this.autoCrossCompletedLines(r, c);
+        else this.checkAndHighlightCompletedLines(r, c);
         this.checkWin();
       } else {
         // Wrong: mark mistake
@@ -212,7 +243,7 @@ class Engine {
       else if (count > 0) { hints.push(count); count = 0; }
     }
     if (count > 0) hints.push(count);
-    return hints.length ? hints : [0];
+    return hints;
   }
 
   getPlayerHints(line) {
@@ -235,18 +266,21 @@ class Engine {
   }
 
   autoCrossCompletedLines(row, col) {
+    let rowComplete = false;
+    let colComplete = false;
+
     // Check row
     const rowHints = this.getHintsFromSolution(this.solution[row]);
     const playerRowHints = this.getPlayerHints(this.playerBoard[row]);
     
-    if (this.arraysEqual(rowHints, playerRowHints)) {
-      let hasAutoCross = false;
+    if (this.arraysEqual(rowHints, playerRowHints) && !this.completedRows.has(row)) {
+      rowComplete = true;
+      this.completedRows.add(row);
       for (let c = 0; c < this.size; c++) {
         if (this.playerBoard[row][c] === 0) {
           this.playerBoard[row][c] = 2;
           this.updateCellUI(row, c);
           this.addLineCompleteAnimation(row, c);
-          hasAutoCross = true;
         }
       }
     }
@@ -258,7 +292,9 @@ class Engine {
     const playerColData = this.playerBoard.map(r => r[col]);
     const playerColHints = this.getPlayerHints(playerColData);
 
-    if (this.arraysEqual(colHints, playerColHints)) {
+    if (this.arraysEqual(colHints, playerColHints) && !this.completedCols.has(col)) {
+      colComplete = true;
+      this.completedCols.add(col);
       for (let r = 0; r < this.size; r++) {
         if (this.playerBoard[r][col] === 0) {
           this.playerBoard[r][col] = 2;
@@ -266,6 +302,53 @@ class Engine {
           this.addLineCompleteAnimation(r, col);
         }
       }
+    }
+
+    // Update hint highlighting if option enabled
+    if ((rowComplete || colComplete) && this.highlightComplete) {
+      this.updateHintHighlighting();
+    }
+  }
+
+  updateHintHighlighting() {
+    // Update row hints
+    for (let r = 0; r < this.size; r++) {
+      const hintEl = this.els.hLeft.children[r];
+      if (this.completedRows.has(r)) {
+        hintEl.classList.add('complete');
+      }
+    }
+    // Update column hints
+    for (let c = 0; c < this.size; c++) {
+      const hintEl = this.els.hTop.children[c];
+      if (this.completedCols.has(c)) {
+        hintEl.classList.add('complete');
+      }
+    }
+  }
+
+  checkAndHighlightCompletedLines(row, col) {
+    if (!this.highlightComplete) return;
+
+    // Check row
+    const rowHints = this.getHintsFromSolution(this.solution[row]);
+    const playerRowHints = this.getPlayerHints(this.playerBoard[row]);
+    
+    if (this.arraysEqual(rowHints, playerRowHints) && !this.completedRows.has(row)) {
+      this.completedRows.add(row);
+      this.updateHintHighlighting();
+    }
+
+    // Check column
+    const colData = this.solution.map(r => r[col]);
+    const colHints = this.getHintsFromSolution(colData);
+    
+    const playerColData = this.playerBoard.map(r => r[col]);
+    const playerColHints = this.getPlayerHints(playerColData);
+
+    if (this.arraysEqual(colHints, playerColHints) && !this.completedCols.has(col)) {
+      this.completedCols.add(col);
+      this.updateHintHighlighting();
     }
   }
 
