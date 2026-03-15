@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Nonogram Pro PWA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <header><h1>NONOGRAM PRO</h1></header>
+
+  <div class="stats">
+    <div class="diff-controls">
+      <select id="diffSelect">
+        <option value="5">5x5</option>
+        <option value="10" selected>10x10</option>
+        <option value="15">15x15</option>
+      </select>
+      <button id="newGame">New Puzzle</button>
+    </div>
+    <div>Time: <span id="timer">00:00</span></div>
+    <div>Mistakes: <span id="mistakes">0/3</span></div>
+  </div>
+
+  <div id="msg" class="message"></div>
+
+  <div class="game-wrapper">
+    <div class="game-layout">
+      <div class="corner"></div>
+      <div id="hintsTop" class="hints-top"></div>
+      <div id="hintsLeft" class="hints-left"></div>
+      <div id="grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div class="controls-footer">
+    <div class="mode-switch">
+      <button id="modeFill" class="mode-btn active">FILL</button>
+      <button id="modeCross" class="mode-btn">CROSS</button>
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="checkbox" id="autoCross" checked>
+        <span>Auto-cross</span>
+      </label>
+      <label class="option">
+        <input type="checkbox" id="showCorrect" checked>
+        <span>Show correct on error</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
