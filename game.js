@@ -330,7 +330,8 @@ class Engine {
   }
 
   updateStats() {
-    this.els.mistakes.textContent = `${this.mistakes}/3`;
+    const hearts = '❤️'.repeat(3 - this.mistakes) + '🖤'.repeat(this.mistakes);
+    this.els.mistakes.textContent = hearts;
   }
 
   startTimer() {
