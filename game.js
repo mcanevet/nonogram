@@ -6,8 +6,6 @@ class Engine {
     this.mistakes = 0;
     this.isGameOver = false;
     this.mode = 'fill'; 
-    this.seconds = 0;
-    this.timerInt = null;
     this.autoCross = false;
     this.showCorrect = false;
     this.highlightComplete = false;
@@ -19,7 +17,6 @@ class Engine {
       hTop: document.getElementById('hintsTop'),
       hLeft: document.getElementById('hintsLeft'),
       mistakes: document.getElementById('mistakes'),
-      timer: document.getElementById('timer'),
       msg: document.getElementById('msg'),
       diff: document.getElementById('diffSelect')
     };
@@ -58,7 +55,6 @@ class Engine {
   }
 
   init() {
-    clearInterval(this.timerInt);
     this.size = parseInt(this.els.diff.value);
     this.completedRows = new Set();
     this.completedCols = new Set();
@@ -77,7 +73,6 @@ class Engine {
     
     this.render();
     this.updateModeButton();
-    this.startTimer();
     this.updateStats();
   }
 
@@ -232,7 +227,6 @@ class Engine {
     this.els.msg.textContent = "GAME OVER";
     this.els.msg.className = "message lose";
     this.revealSolution();
-    clearInterval(this.timerInt);
   }
 
   getHintsFromSolution(line) {
@@ -391,7 +385,6 @@ class Engine {
       this.isGameOver = true;
       this.els.msg.textContent = "PUZZLE SOLVED!";
       this.els.msg.className = "message win";
-      clearInterval(this.timerInt);
       this.playWinAnimation();
     }
   }
@@ -415,15 +408,6 @@ class Engine {
   updateStats() {
     const hearts = '❤️'.repeat(3 - this.mistakes) + '🖤'.repeat(this.mistakes);
     this.els.mistakes.textContent = hearts;
-  }
-
-  startTimer() {
-    this.timerInt = setInterval(() => {
-      this.seconds++;
-      const m = Math.floor(this.seconds / 60).toString().padStart(2, '0');
-      const s = (this.seconds % 60).toString().padStart(2, '0');
-      this.els.timer.textContent = `${m}:${s}`;
-    }, 1000);
   }
 }
 
