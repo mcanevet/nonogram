@@ -89,8 +89,8 @@ class Engine {
 
   render() {
     // Adjust hint box sizes based on grid size
-    const hintMinHeight = this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px');
-    const hintMinWidth = this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px');
+    const hintMinHeight = this.size >= 20 ? '25px' : (this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px'));
+    const hintMinWidth = this.size >= 20 ? '25px' : (this.size >= 15 ? '30px' : (this.size >= 10 ? '35px' : '40px'));
     
     // Render Top Hints
     this.els.hTop.innerHTML = "";
