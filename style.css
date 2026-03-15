@@ -100,6 +100,10 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
   background: var(--border);
 }
 
+.corner {
+  background: var(--surface);
+}
+
 .hint-box {
   background: var(--surface);
   display: flex;
@@ -146,6 +150,7 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
   gap: 1px;
   background: var(--border);
   touch-action: none;
+  border: 1px solid var(--border);
 }
 
 .cell {
