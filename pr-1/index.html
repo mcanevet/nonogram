@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="A nonogram/picross puzzle game">
+  <meta name="theme-color" content="#e94560">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nonogram">
+  <title>Nonogram Pro</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a1a2e' width='100' height='100'/><rect fill='%23e94560' x='10' y='30' width='20' height='20'/><rect fill='%23e94560' x='40' y='30' width='20' height='20'/><rect fill='%23e94560' x='70' y='30' width='20' height='20'/><rect fill='%23e94560' x='30' y='50' width='40' height='20'/></svg>">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>NONOGRAM PRO</h1>
+    <span id="version" class="version"></span>
+  </header>
+
+  <div class="stats">
+    <div class="diff-controls">
+      <select id="diffSelect">
+        <option value="5">5x5</option>
+        <option value="10" selected>10x10</option>
+        <option value="15">15x15</option>
+        <option value="20">20x20</option>
+      </select>
+      <button id="newGame">New Puzzle</button>
+    </div>
+    <div>Lives: <span id="mistakes">❤️❤️❤️</span></div>
+  </div>
+
+  <div id="msg" class="message"></div>
+
+  <div class="game-wrapper">
+    <div class="game-layout">
+      <div class="corner"></div>
+      <div id="hintsTop" class="hints-top"></div>
+      <div id="hintsLeft" class="hints-left"></div>
+      <div id="grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div class="controls-footer">
+    <button id="modeToggle" class="mode-toggle">
+      <span class="mode-icon">●</span>
+      <span class="mode-label">FILL</span>
+    </button>
+    <div class="options">
+      <label class="option">
+        <input type="checkbox" id="autoCross" checked>
+        <span>Auto-cross</span>
+      </label>
+      <label class="option">
+        <input type="checkbox" id="highlightComplete" checked>
+        <span>Highlight complete</span>
+      </label>
+      <label class="option">
+        <input type="checkbox" id="showCorrect" checked>
+        <span>Show correct on error</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+<script>
+  const versionEl = document.getElementById('version');
+  if (window.location.protocol === 'file:') {
+    versionEl.textContent = 'v1.0.0';
+  } else {
+    fetch('manifest.json')
+      .then(r => r.json())
+      .then(m => { versionEl.textContent = 'v' + m.version; })
+      .catch(() => { versionEl.textContent = 'v1.0.0'; });
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
