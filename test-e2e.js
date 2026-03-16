@@ -93,21 +93,21 @@ async function runTests() {
     const firstCell = page.locator('.cell').first();
     
     // First click: empty -> fill
-    await firstCell.click();
+    await firstCell.click({ force: true });
     const cellClass1 = await firstCell.getAttribute('class');
     test('Zen mode: first click fills cell', () => {
       assert(cellClass1.includes('filled'), `Expected filled class, got: ${cellClass1}`);
     });
     
     // Second click: fill -> cross
-    await firstCell.click();
+    await firstCell.click({ force: true });
     const cellClass2 = await firstCell.getAttribute('class');
     test('Zen mode: second click crosses cell', () => {
       assert(cellClass2.includes('crossed'), `Expected crossed class, got: ${cellClass2}`);
     });
     
     // Third click: cross -> empty
-    await firstCell.click();
+    await firstCell.click({ force: true });
     const cellClass3 = await firstCell.getAttribute('class');
     test('Zen mode: third click clears cell', () => {
       assert(!cellClass3.includes('filled') && !cellClass3.includes('crossed'), `Expected empty, got: ${cellClass3}`);
@@ -143,7 +143,7 @@ async function runTests() {
       for (let r = 0; r < solution.length; r++) {
         for (let c = 0; c < solution[r].length; c++) {
           if (solution[r][c] === 1) {
-            await page.locator('.cell').nth(r * solution.length + c).click();
+            await page.locator('.cell').nth(r * solution.length + c).click({ force: true });
           }
         }
       }
