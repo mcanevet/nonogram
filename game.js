@@ -8,7 +8,6 @@ class Engine {
     this.mode = 'fill'; 
     this.gameMode = 'classic'; // 'classic' or 'zen'
     this.autoCross = false;
-    this.showCorrect = false;
     this.highlightComplete = false;
     this.completedRows = new Set();
     this.completedCols = new Set();
@@ -27,10 +26,8 @@ class Engine {
     document.getElementById('newGame').onclick = () => this.init();
     document.getElementById('modeToggle').onclick = () => this.toggleMode();
     document.getElementById('autoCross').onchange = (e) => this.autoCross = e.target.checked;
-    document.getElementById('showCorrect').onchange = (e) => this.showCorrect = e.target.checked;
     document.getElementById('highlightComplete').onchange = (e) => this.highlightComplete = e.target.checked;
     this.autoCross = document.getElementById('autoCross').checked;
-    this.showCorrect = document.getElementById('showCorrect').checked;
     this.highlightComplete = document.getElementById('highlightComplete').checked;
     
     this.init();
@@ -209,10 +206,8 @@ class Engine {
           this.checkWin();
         } else {
           this.mistakes++;
-          if (this.showCorrect) {
-            this.playerBoard[r][c] = 2;
-            this.updateCellUI(r, c);
-          }
+          this.playerBoard[r][c] = 2;
+          this.updateCellUI(r, c);
           this.showErrorAnimation(r, c);
           this.updateStats();
           this.errorCooldown = true;
@@ -225,10 +220,8 @@ class Engine {
         // Cross mode
         if (correct === 1) {
           this.mistakes++;
-          if (this.showCorrect) {
-            this.playerBoard[r][c] = 1;
-            this.updateCellUI(r, c);
-          }
+          this.playerBoard[r][c] = 1;
+          this.updateCellUI(r, c);
           this.showErrorAnimation(r, c);
           this.updateStats();
           this.errorCooldown = true;
