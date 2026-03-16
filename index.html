@@ -15,7 +15,10 @@
 <body>
 
 <div class="app">
-  <header><h1>NONOGRAM PRO</h1></header>
+  <header>
+    <h1>NONOGRAM PRO</h1>
+    <span id="version" class="version"></span>
+  </header>
 
   <div class="stats">
     <div class="diff-controls">
@@ -64,6 +67,11 @@
 </div>
 
 <script src="game.js"></script>
+<script>
+  fetch('manifest.json').then(r => r.json()).then(m => {
+    document.getElementById('version').textContent = 'v' + m.version || '1.0.0';
+  }).catch(() => {});
+</script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
