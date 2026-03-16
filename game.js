@@ -95,6 +95,9 @@ class Engine {
       this.highlightComplete = document.getElementById('highlightComplete').checked;
     }
     
+    // Hide mode toggle button in Zen mode
+    document.getElementById('modeToggle').style.display = this.gameMode === 'zen' ? 'none' : 'flex';
+    
     this.render();
     this.updateModeButton();
     this.updateStats();
