@@ -177,20 +177,20 @@ class Engine {
     const current = this.playerBoard[r][c];
     const correct = this.solution[r][c];
 
-    // Only allow input on empty cells
-    if (current !== 0) return;
-
     // Haptic feedback
     if (navigator.vibrate) {
       navigator.vibrate(10);
     }
 
     if (this.gameMode === 'zen') {
-      // Zen mode: don't check correctness, just mark the cell
-      if (this.mode === 'fill') {
-        this.playerBoard[r][c] = 1;
+      // Zen mode: cycle through empty -> fill -> cross -> empty
+      const current = this.playerBoard[r][c];
+      if (current === 0) {
+        this.playerBoard[r][c] = 1; // fill
+      } else if (current === 1) {
+        this.playerBoard[r][c] = 2; // cross
       } else {
-        this.playerBoard[r][c] = 2;
+        this.playerBoard[r][c] = 0; // clear
       }
       this.updateCellUI(r, c);
       if (this.autoCross) this.autoCrossCompletedLines(r, c);
