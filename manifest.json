@@ -1,6 +1,7 @@
 {
   "name": "Nonogram Pro",
   "short_name": "Nonogram",
+  "version": "1.0.0",
   "description": "A nonogram/picross puzzle game",
   "start_url": "/nonogram/",
   "display": "standalone",
