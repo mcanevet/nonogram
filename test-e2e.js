@@ -138,7 +138,9 @@ async function runTests() {
     // Test 9: Win animation triggers on solve (classic mode)
     const solution = await page.evaluate(() => window.game?.solution || []);
     if (solution.length > 0) {
-      console.log(`  Testing win on ${solution.length}x${solution[0].length} solution`);
+      test('Can solve puzzle', () => {
+        assert(solution.length > 0, 'Solution should exist');
+      });
       
       for (let r = 0; r < solution.length; r++) {
         for (let c = 0; c < solution[r].length; c++) {
