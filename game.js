@@ -76,8 +76,24 @@ class Engine {
     this.els.msg.textContent = "";
     this.els.msg.className = "message";
     
-    // Show/hide lives based on game mode
+    // Show/hide lives and options based on game mode
     this.els.livesContainer.style.display = this.gameMode === 'zen' ? 'none' : 'block';
+    
+    const optionsContainer = document.querySelector('.options');
+    const autoCrossOption = document.querySelector('label:has(#autoCross)');
+    const highlightOption = document.querySelector('label:has(#highlightComplete)');
+    
+    if (this.gameMode === 'zen') {
+      if (autoCrossOption) autoCrossOption.style.display = 'none';
+      if (highlightOption) highlightOption.style.display = 'none';
+      this.autoCross = false;
+      this.highlightComplete = false;
+    } else {
+      if (autoCrossOption) autoCrossOption.style.display = 'flex';
+      if (highlightOption) highlightOption.style.display = 'flex';
+      this.autoCross = document.getElementById('autoCross').checked;
+      this.highlightComplete = document.getElementById('highlightComplete').checked;
+    }
     
     this.render();
     this.updateModeButton();
