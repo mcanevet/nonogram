@@ -69,14 +69,18 @@
 <script src="game.js"></script>
 <script>
   const versionEl = document.getElementById('version');
-  fetch('manifest.json')
-    .then(r => r.json())
-    .then(m => { versionEl.textContent = 'v' + m.version; })
-    .catch(() => { versionEl.textContent = 'v1.0.0'; });
+  if (window.location.protocol === 'file:') {
+    versionEl.textContent = 'v1.0.0';
+  } else {
+    fetch('manifest.json')
+      .then(r => r.json())
+      .then(m => { versionEl.textContent = 'v' + m.version; })
+      .catch(() => { versionEl.textContent = 'v1.0.0'; });
+  }
 </script>
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+  if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 </script>
 </body>
