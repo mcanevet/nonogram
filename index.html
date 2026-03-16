@@ -68,9 +68,11 @@
 
 <script src="game.js"></script>
 <script>
-  fetch('manifest.json').then(r => r.json()).then(m => {
-    document.getElementById('version').textContent = 'v' + m.version || '1.0.0';
-  }).catch(() => {});
+  const versionEl = document.getElementById('version');
+  fetch('manifest.json')
+    .then(r => r.json())
+    .then(m => { versionEl.textContent = 'v' + m.version; })
+    .catch(() => { versionEl.textContent = 'v1.0.0'; });
 </script>
 <script>
   if ('serviceWorker' in navigator) {
