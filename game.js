@@ -6,6 +6,7 @@ class Engine {
     this.mistakes = 0;
     this.isGameOver = false;
     this.mode = 'fill'; 
+    this.gameMode = 'classic'; // 'classic' or 'zen'
     this.autoCross = false;
     this.showCorrect = false;
     this.highlightComplete = false;
@@ -19,7 +20,8 @@ class Engine {
       hLeft: document.getElementById('hintsLeft'),
       mistakes: document.getElementById('mistakes'),
       msg: document.getElementById('msg'),
-      diff: document.getElementById('diffSelect')
+      diff: document.getElementById('diffSelect'),
+      livesContainer: document.getElementById('livesContainer')
     };
 
     document.getElementById('newGame').onclick = () => this.init();
@@ -64,6 +66,7 @@ class Engine {
 
   init() {
     this.size = parseInt(this.els.diff.value);
+    this.gameMode = document.getElementById('gameMode').value;
     this.completedRows = new Set();
     this.completedCols = new Set();
     
@@ -75,6 +78,9 @@ class Engine {
     this.isGameOver = false;
     this.els.msg.textContent = "";
     this.els.msg.className = "message";
+    
+    // Show/hide lives based on game mode
+    this.els.livesContainer.style.display = this.gameMode === 'zen' ? 'none' : 'block';
     
     this.render();
     this.updateModeButton();
@@ -179,59 +185,61 @@ class Engine {
       navigator.vibrate(10);
     }
 
-    if (this.mode === 'fill') {
-      if (correct === 1) {
-        // Correct: fill the cell
+    if (this.gameMode === 'zen') {
+      // Zen mode: don't check correctness, just mark the cell
+      if (this.mode === 'fill') {
         this.playerBoard[r][c] = 1;
-        this.updateCellUI(r, c);
-        if (this.autoCross) this.autoCrossCompletedLines(r, c);
-        else this.checkAndHighlightCompletedLines(r, c);
-        this.checkWin();
       } else {
-        // Wrong: mark mistake
-        this.mistakes++;
-        
-        if (this.showCorrect) {
-          // Show correct value: should be crossed
+        this.playerBoard[r][c] = 2;
+      }
+      this.updateCellUI(r, c);
+      if (this.autoCross) this.autoCrossCompletedLines(r, c);
+      else this.checkAndHighlightCompletedLines(r, c);
+      
+      // Check win only when all cells are filled
+      this.checkWinZen();
+    } else {
+      // Classic mode: check correctness on each click
+      if (this.mode === 'fill') {
+        if (correct === 1) {
+          this.playerBoard[r][c] = 1;
+          this.updateCellUI(r, c);
+          if (this.autoCross) this.autoCrossCompletedLines(r, c);
+          else this.checkAndHighlightCompletedLines(r, c);
+          this.checkWin();
+        } else {
+          this.mistakes++;
+          if (this.showCorrect) {
+            this.playerBoard[r][c] = 2;
+            this.updateCellUI(r, c);
+          }
+          this.showErrorAnimation(r, c);
+          this.updateStats();
+          this.errorCooldown = true;
+          setTimeout(() => this.errorCooldown = false, 500);
+          if (this.mistakes >= 3) {
+            this.gameOver();
+          }
+        }
+      } else {
+        // Cross mode
+        if (correct === 1) {
+          this.mistakes++;
+          if (this.showCorrect) {
+            this.playerBoard[r][c] = 1;
+            this.updateCellUI(r, c);
+          }
+          this.showErrorAnimation(r, c);
+          this.updateStats();
+          this.errorCooldown = true;
+          setTimeout(() => this.errorCooldown = false, 500);
+          if (this.mistakes >= 3) {
+            this.gameOver();
+          }
+        } else {
           this.playerBoard[r][c] = 2;
           this.updateCellUI(r, c);
         }
-        this.showErrorAnimation(r, c);
-        this.updateStats();
-        
-        // Pause input briefly to prevent accidental extra mistakes
-        this.errorCooldown = true;
-        setTimeout(() => this.errorCooldown = false, 500);
-        
-        if (this.mistakes >= 3) {
-          this.gameOver();
-        }
-      }
-    } else {
-      // Cross mode
-      if (correct === 1) {
-        // Wrong: mark mistake
-        this.mistakes++;
-        
-        if (this.showCorrect) {
-          // Show correct value: should be filled
-          this.playerBoard[r][c] = 1;
-          this.updateCellUI(r, c);
-        }
-        this.showErrorAnimation(r, c);
-        this.updateStats();
-        
-        // Pause input briefly to prevent accidental extra mistakes
-        this.errorCooldown = true;
-        setTimeout(() => this.errorCooldown = false, 500);
-        
-        if (this.mistakes >= 3) {
-          this.gameOver();
-        }
-      } else {
-        // Correct: cross the cell
-        this.playerBoard[r][c] = 2;
-        this.updateCellUI(r, c);
       }
     }
   }
@@ -403,6 +411,27 @@ class Engine {
       row.every((val, c) => (val === 1 ? this.playerBoard[r][c] === 1 : true))
     );
     if (won) {
+      this.isGameOver = true;
+      this.els.msg.textContent = "PUZZLE SOLVED!";
+      this.els.msg.className = "message win";
+      this.playWinAnimation();
+    }
+  }
+
+  checkWinZen() {
+    // Check if all cells are filled (1=filled, 2=crossed)
+    const allFilled = this.playerBoard.every(row => row.every(cell => cell !== 0));
+    if (!allFilled) return;
+    
+    // Check if solution matches
+    const correct = this.solution.every((row, r) => 
+      row.every((val, c) => {
+        if (val === 1) return this.playerBoard[r][c] === 1;
+        return this.playerBoard[r][c] === 2;
+      })
+    );
+    
+    if (correct) {
       this.isGameOver = true;
       this.els.msg.textContent = "PUZZLE SOLVED!";
       this.els.msg.className = "message win";
