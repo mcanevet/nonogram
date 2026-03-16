@@ -11,6 +11,7 @@ class Engine {
     this.highlightComplete = false;
     this.completedRows = new Set();
     this.completedCols = new Set();
+    this.errorCooldown = false;
 
     this.els = {
       grid: document.getElementById('grid'),
@@ -165,7 +166,7 @@ class Engine {
   }
 
   handleInput(r, c) {
-    if (this.isGameOver) return;
+    if (this.isGameOver || this.errorCooldown) return;
     
     const current = this.playerBoard[r][c];
     const correct = this.solution[r][c];
@@ -198,6 +199,10 @@ class Engine {
         this.showErrorAnimation(r, c);
         this.updateStats();
         
+        // Pause input briefly to prevent accidental extra mistakes
+        this.errorCooldown = true;
+        setTimeout(() => this.errorCooldown = false, 500);
+        
         if (this.mistakes >= 3) {
           this.gameOver();
         }
@@ -215,6 +220,10 @@ class Engine {
         }
         this.showErrorAnimation(r, c);
         this.updateStats();
+        
+        // Pause input briefly to prevent accidental extra mistakes
+        this.errorCooldown = true;
+        setTimeout(() => this.errorCooldown = false, 500);
         
         if (this.mistakes >= 3) {
           this.gameOver();
