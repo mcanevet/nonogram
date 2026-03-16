@@ -433,7 +433,7 @@ class Engine {
 }
 
 // Start the game
-new Engine();
+window.game = new Engine();
 
 // Solver for unique solution validation
 class PuzzleSolver {
