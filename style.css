@@ -65,7 +65,7 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
   gap: 8px;
 }
 
-#diffSelect {
+#diffSelect, #gameMode {
   background: #0f3460;
   color: white;
   border: 1px solid var(--grid-line);
