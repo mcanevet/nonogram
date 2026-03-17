@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/mcanevet/nonogram/compare/v1.3.0...v1.4.0) (2026-03-17)
+
+
+### Features
+
+* add drag to paint ([644b62f](https://github.com/mcanevet/nonogram/commit/644b62f6667d0c69528e3529b9a161f6734de38e))
+* add variety, preview, and fix win detection ([1475f41](https://github.com/mcanevet/nonogram/commit/1475f41a946f0503651e232dddfb757c9703fe3f))
+
+
+### Bug Fixes
+
+* protect already-set cells during drag ([04575c2](https://github.com/mcanevet/nonogram/commit/04575c2ab6f833c6cdac012efd4a57388dcaebd4))
+
 ## [1.3.0](https://github.com/mcanevet/nonogram/compare/v1.2.0...v1.3.0) (2026-03-17)
 
 
