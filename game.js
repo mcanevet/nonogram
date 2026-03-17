@@ -56,9 +56,26 @@ class Engine {
 
   generatePuzzle() {
     // Generate random grid with balanced density
-    return Array.from({length: this.size}, () => 
-      Array.from({length: this.size}, () => Math.random() > 0.45 ? 1 : 0)
-    );
+    let puzzle;
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    // Only validate uniqueness for small grids (too slow for larger)
+    const validateUnique = this.size <= 5;
+    
+    do {
+      puzzle = Array.from({length: this.size}, () => 
+        Array.from({length: this.size}, () => Math.random() > 0.45 ? 1 : 0)
+      );
+      attempts++;
+    } while (validateUnique && attempts < maxAttempts && !this.hasUniqueSolution(puzzle));
+    
+    return puzzle;
+  }
+  
+  hasUniqueSolution(puzzle) {
+    const solver = new PuzzleSolver(puzzle);
+    return solver.countSolutions(2) === 1;
   }
 
   init() {
