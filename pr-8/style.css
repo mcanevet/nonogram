@@ -43,6 +43,11 @@ header {
   gap: 4px;
 }
 
+.preview {
+  font-size: 2rem;
+  min-height: 2.5rem;
+}
+
 header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
 
 .version {

@@ -19,16 +19,37 @@ class Engine {
   }
 
   generatePuzzle() {
-    // Pre-defined emoji-like patterns (each is 5x5 or scaled)
+    // Pre-defined patterns with emoji names
     const patterns = [
-      [[0,1,0,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]],
-      [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,0,1,0,1]],
-      [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[1,1,0,1,1],[1,1,1,1,1]],
-      [[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[1,0,1,0,1],[1,1,0,1,1]],
-      [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0],[0,1,0,1,0]],
+      { emoji: '❤️', grid: [[0,1,0,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '⭐', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,0,1,0,1]] },
+      { emoji: '😊', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[1,1,0,1,1],[1,1,1,1,1]] },
+      { emoji: '🐱', grid: [[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[1,0,1,0,1],[1,1,0,1,1]] },
+      { emoji: '🌸', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0],[0,1,0,1,0]] },
+      { emoji: '🍀', grid: [[0,0,1,0,0],[0,1,1,1,0],[0,0,1,0,0],[1,1,1,1,1],[0,1,0,1,0]] },
+      { emoji: '🔥', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,1,1,1,1],[0,1,0,1,0]] },
+      { emoji: '💎', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,0,1,1]] },
+      { emoji: '🎮', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0],[0,1,1,1,0]] },
+      { emoji: '⚽', grid: [[0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0]] },
+      { emoji: '🚀', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,0,1,0],[0,1,0,1,0]] },
+      { emoji: '🌙', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[0,0,1,0,0]] },
+      { emoji: '☀️', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '🌈', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[1,0,1,0,1]] },
+      { emoji: '🍕', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,1,1,0],[0,1,0,1,0]] },
+      { emoji: '🎸', grid: [[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '🎯', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,0,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '🏆', grid: [[0,1,1,1,0],[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1]] },
+      { emoji: '🐶', grid: [[1,0,0,0,1],[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0]] },
+      { emoji: '🦁', grid: [[1,0,1,0,1],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[1,0,1,0,1]] },
+      { emoji: '🍄', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,1,0,1,0],[0,1,0,1,0]] },
+      { emoji: '🌵', grid: [[0,0,1,0,0],[0,1,1,1,0],[0,0,1,0,0],[0,1,0,1,0],[0,1,0,1,0]] },
+      { emoji: '⏰', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0],[0,1,1,1,0]] },
+      { emoji: '🔔', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,0,1,0],[0,1,0,1,0],[0,1,0,1,0]] },
     ];
     
-    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    const selected = patterns[Math.floor(Math.random() * patterns.length)];
+    this.currentEmoji = selected.emoji;
+    const pattern = selected.grid;
     
     if (this.size === 5) {
       return pattern;
@@ -50,6 +71,10 @@ class Engine {
     this.isGameOver = false;
     this.els.msg.textContent = "";
     this.els.msg.className = "message";
+    
+    // Show preview emoji
+    const previewEl = document.getElementById('preview');
+    if (previewEl) previewEl.textContent = this.currentEmoji || '';
     
     this.render();
   }
@@ -100,6 +125,8 @@ class Engine {
     // Render Grid
     this.els.grid.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
     this.els.grid.innerHTML = "";
+    this.dragAction = null; // Track drag action
+    
     for(let r=0; r<this.size; r++) {
       for(let c=0; c<this.size; c++) {
         const cell = document.createElement('div');
@@ -108,16 +135,27 @@ class Engine {
         if ((r + 1) % 5 === 0 && r !== this.size - 1) cell.classList.add('border-bottom');
         
         cell.onpointerdown = (e) => {
-          cell.releasePointerCapture(e.pointerId); 
+          cell.releasePointerCapture(e.pointerId);
+          this.startDrag(r, c);
           this.handleInput(r, c);
         };
         cell.onpointerenter = (e) => {
-          if (e.buttons === 1) this.handleInput(r, c);
+          if (e.buttons === 1 && this.dragAction !== null) {
+            this.applyDrag(r, c);
+          }
+        };
+        cell.onpointerup = () => {
+          this.dragAction = null;
         };
         
         this.els.grid.appendChild(cell);
       }
     }
+    
+    // Global pointerup to end drag
+    document.onpointerup = () => {
+      this.dragAction = null;
+    };
     
     this.syncHintWidths();
   }
@@ -133,6 +171,34 @@ class Engine {
     if (gridRows && gridRows !== 'none') {
       this.els.hLeft.style.gridTemplateRows = gridRows;
     }
+  }
+
+  startDrag(r, c) {
+    // Record the action based on starting cell state
+    const current = this.playerBoard[r][c];
+    // 0 -> 1 (fill), 1 -> 2 (cross), 2 -> 0 (clear)
+    this.dragAction = current;
+  }
+
+  applyDrag(r, c) {
+    // Only apply to cells that are in the SAME state as the starting cell
+    // This protects already-set cells from being changed
+    const current = this.playerBoard[r][c];
+    
+    // Skip if cell is not in the same state as drag started
+    if (current !== this.dragAction) return;
+    
+    // Cycle to next state: empty(0)→fill(1)→cross(2)→empty(0)
+    if (current === 0) {
+      this.playerBoard[r][c] = 1;
+    } else if (current === 1) {
+      this.playerBoard[r][c] = 2;
+    } else {
+      this.playerBoard[r][c] = 0;
+    }
+    
+    this.updateCellUI(r, c);
+    this.checkWinZen();
   }
 
   handleInput(r, c) {
@@ -172,19 +238,15 @@ class Engine {
   }
 
   checkWinZen() {
-    // Check if all cells are filled (1=filled, 2=crossed)
-    const allFilled = this.playerBoard.every(row => row.every(cell => cell !== 0));
-    if (!allFilled) return;
-    
-    // Check if solution matches
-    const correct = this.solution.every((row, r) => 
+    // Check if all filled cells in solution are correctly filled
+    const allFilled = this.solution.every((row, r) => 
       row.every((val, c) => {
         if (val === 1) return this.playerBoard[r][c] === 1;
-        return this.playerBoard[r][c] === 2;
+        return true; // Empty/crossed cells don't matter for 0s in solution
       })
     );
     
-    if (correct) {
+    if (allFilled) {
       this.isGameOver = true;
       this.els.msg.textContent = "SOLVED!";
       this.els.msg.className = "message win";
