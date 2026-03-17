@@ -20,7 +20,7 @@
 
 <div class="app">
   <header>
-    <h1>NONOGRAM PRO</h1>
+    <h1>NONOGRAM</h1>
     <span id="version" class="version"></span>
   </header>
 
@@ -32,13 +32,8 @@
         <option value="15">15x15</option>
         <option value="20">20x20</option>
       </select>
-      <select id="gameMode">
-        <option value="classic">Classic</option>
-        <option value="zen" selected>Zen</option>
-      </select>
-      <button id="newGame">New Puzzle</button>
+      <button id="newGame">New</button>
     </div>
-    <div id="livesContainer">Lives: <span id="mistakes">❤️❤️❤️</span></div>
   </div>
 
   <div id="msg" class="message"></div>
@@ -49,23 +44,6 @@
       <div id="hintsTop" class="hints-top"></div>
       <div id="hintsLeft" class="hints-left"></div>
       <div id="grid" class="grid"></div>
-    </div>
-  </div>
-
-  <div class="controls-footer">
-    <button id="modeToggle" class="mode-toggle">
-      <span class="mode-icon">●</span>
-      <span class="mode-label">FILL</span>
-    </button>
-    <div class="options">
-      <label class="option">
-        <input type="checkbox" id="autoCross" checked>
-        <span>Auto-cross</span>
-      </label>
-      <label class="option">
-        <input type="checkbox" id="highlightComplete" checked>
-        <span>Highlight complete</span>
-      </label>
     </div>
   </div>
 </div>
