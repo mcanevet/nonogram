@@ -100,6 +100,8 @@ class Engine {
     // Render Grid
     this.els.grid.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
     this.els.grid.innerHTML = "";
+    this.dragAction = null; // Track drag action
+    
     for(let r=0; r<this.size; r++) {
       for(let c=0; c<this.size; c++) {
         const cell = document.createElement('div');
@@ -108,30 +110,58 @@ class Engine {
         if ((r + 1) % 5 === 0 && r !== this.size - 1) cell.classList.add('border-bottom');
         
         cell.onpointerdown = (e) => {
-          cell.releasePointerCapture(e.pointerId); 
+          cell.releasePointerCapture(e.pointerId);
+          this.startDrag(r, c);
           this.handleInput(r, c);
         };
         cell.onpointerenter = (e) => {
-          if (e.buttons === 1) this.handleInput(r, c);
+          if (e.buttons === 1 && this.dragAction !== null) {
+            this.applyDrag(r, c);
+          }
+        };
+        cell.onpointerup = () => {
+          this.dragAction = null;
         };
         
         this.els.grid.appendChild(cell);
       }
     }
     
+    // Global pointerup to end drag
+    document.onpointerup = () => {
+      this.dragAction = null;
+    };
+    
     this.syncHintWidths();
   }
 
-  syncHintWidths() {
-    const gridStyle = getComputedStyle(this.els.grid);
-    const gridCols = gridStyle.gridTemplateColumns;
-    const gridRows = gridStyle.gridTemplateRows;
+  startDrag(r, c) {
+    // Record the action based on starting cell state
+    const current = this.playerBoard[r][c];
+    // 0 -> 1 (fill), 1 -> 2 (cross), 2 -> 0 (clear)
+    this.dragAction = current;
+  }
+
+  applyDrag(r, c) {
+    // Apply the same action to all dragged cells
+    const current = this.playerBoard[r][c];
     
-    if (gridCols && gridCols !== 'none') {
-      this.els.hTop.style.gridTemplateColumns = gridCols;
-    }
-    if (gridRows && gridRows !== 'none') {
-      this.els.hLeft.style.gridTemplateRows = gridRows;
+    // Skip if cell already has the target state from drag action
+    let target;
+    if (this.dragAction === 0) target = 1;
+    else if (this.dragAction === 1) target = 2;
+    else target = 0;
+    
+    if (current !== target) {
+      if (target === 1) {
+        this.playerBoard[r][c] = 1;
+      } else if (target === 2) {
+        this.playerBoard[r][c] = 2;
+      } else {
+        this.playerBoard[r][c] = 0;
+      }
+      this.updateCellUI(r, c);
+      this.checkWinZen();
     }
   }
 
