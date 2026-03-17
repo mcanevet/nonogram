@@ -516,6 +516,10 @@ class PuzzleSolver {
     // Pre-compute all valid row patterns for each row
     const rowPatterns = this.rowHints.map(hints => this.generateRowPatterns(hints, this.size));
     
+    // Debug: log row pattern counts
+    const totalPatterns = rowPatterns.reduce((a, b) => a + b.length, 0);
+    console.log(`[Solver ${this.size}x${this.size}] Row patterns: ${rowPatterns.map(p => p.length).join(', ')} (total: ${totalPatterns})`);
+    
     // Use recursive backtracking to find solutions
     const grid = Array(this.size).fill(null).map(() => Array(this.size).fill(-1));
     this.solveRecursive(rowPatterns, grid, 0, () => Date.now() - startTime > this.maxTime);
