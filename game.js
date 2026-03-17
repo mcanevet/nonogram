@@ -194,7 +194,10 @@ class Engine {
     const correct = this.solution[r][c];
 
     // Haptic feedback
-    if (navigator.vibrate) {
+    const hapticTrigger = document.getElementById('haptic-trigger');
+    if (hapticTrigger) {
+      hapticTrigger.checked = !hapticTrigger.checked;
+    } else if (navigator.vibrate) {
       navigator.vibrate(10);
     }
 

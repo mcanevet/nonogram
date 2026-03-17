@@ -302,3 +302,7 @@ header h1 { text-align: center; color: var(--accent); font-size: 1.2rem; }
     height: 85vmin;
   }
 }
+
+/* Haptic feedback elements (hidden) */
+.haptic { display: none; }
+.haptic-label { display: none; }
