@@ -3,80 +3,59 @@ class Engine {
     this.size = 10;
     this.solution = [];
     this.playerBoard = []; // 0: empty, 1: filled, 2: crossed
-    this.mistakes = 0;
     this.isGameOver = false;
-    this.mode = 'fill'; 
-    this.gameMode = 'classic'; // 'classic' or 'zen'
-    this.autoCross = false;
-    this.highlightComplete = false;
-    this.completedRows = new Set();
-    this.completedCols = new Set();
-    this.errorCooldown = false;
 
     this.els = {
       grid: document.getElementById('grid'),
       hTop: document.getElementById('hintsTop'),
       hLeft: document.getElementById('hintsLeft'),
-      mistakes: document.getElementById('mistakes'),
       msg: document.getElementById('msg'),
-      diff: document.getElementById('diffSelect'),
-      livesContainer: document.getElementById('livesContainer')
+      diff: document.getElementById('diffSelect')
     };
 
     document.getElementById('newGame').onclick = () => this.init();
-    document.getElementById('modeToggle').onclick = () => this.toggleMode();
-    document.getElementById('autoCross').onchange = (e) => this.autoCross = e.target.checked;
-    document.getElementById('highlightComplete').onchange = (e) => this.highlightComplete = e.target.checked;
-    this.autoCross = document.getElementById('autoCross').checked;
-    this.highlightComplete = document.getElementById('highlightComplete').checked;
     
     this.init();
   }
 
-  toggleMode() {
-    this.mode = this.mode === 'fill' ? 'cross' : 'fill';
-    this.updateModeButton();
-  }
-
-  updateModeButton() {
-    const btn = document.getElementById('modeToggle');
-    const icon = btn.querySelector('.mode-icon');
-    const label = btn.querySelector('.mode-label');
-    
-    if (this.mode === 'fill') {
-      btn.className = 'mode-toggle fill';
-      icon.textContent = '●';
-      label.textContent = 'FILL';
-    } else {
-      btn.className = 'mode-toggle cross';
-      icon.textContent = '✕';
-      label.textContent = 'CROSS';
-    }
-  }
-
   generatePuzzle() {
-    // Pre-defined emoji-like patterns (each is a 5x5 or scaled)
+    // Pre-defined patterns with emoji names
     const patterns = [
-      // Heart (5x5)
-      [[0,1,0,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]],
-      // Star (5x5)
-      [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,0,1,0,1]],
-      // Smiley (5x5)
-      [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[1,1,0,1,1],[1,1,1,1,1]],
-      // Cat (5x5)
-      [[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[1,0,1,0,1],[1,1,0,1,1]],
-      // Flower (5x5)
-      [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0],[0,1,0,1,0]],
+      { emoji: '❤️', grid: [[0,1,0,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '⭐', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,0,1,0,1]] },
+      { emoji: '😊', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[1,1,0,1,1],[1,1,1,1,1]] },
+      { emoji: '🐱', grid: [[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[1,0,1,0,1],[1,1,0,1,1]] },
+      { emoji: '🌸', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0],[0,1,0,1,0]] },
+      { emoji: '🍀', grid: [[0,0,1,0,0],[0,1,1,1,0],[0,0,1,0,0],[1,1,1,1,1],[0,1,0,1,0]] },
+      { emoji: '🔥', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[1,1,1,1,1],[0,1,0,1,0]] },
+      { emoji: '💎', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,0,1,1]] },
+      { emoji: '🎮', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0],[0,1,1,1,0]] },
+      { emoji: '⚽', grid: [[0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0]] },
+      { emoji: '🚀', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,0,1,0],[0,1,0,1,0]] },
+      { emoji: '🌙', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[0,0,1,0,0]] },
+      { emoji: '☀️', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '🌈', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[1,0,1,0,1]] },
+      { emoji: '🍕', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,1,1,0],[0,1,0,1,0]] },
+      { emoji: '🎸', grid: [[1,0,1,0,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '🎯', grid: [[0,0,1,0,0],[0,1,1,1,0],[1,1,0,1,1],[0,1,1,1,0],[0,0,1,0,0]] },
+      { emoji: '🏆', grid: [[0,1,1,1,0],[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1]] },
+      { emoji: '🐶', grid: [[1,0,0,0,1],[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0]] },
+      { emoji: '🦁', grid: [[1,0,1,0,1],[0,1,1,1,0],[1,1,1,1,1],[1,0,1,0,1],[1,0,1,0,1]] },
+      { emoji: '🍄', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,1,0,1,0],[0,1,0,1,0]] },
+      { emoji: '🌵', grid: [[0,0,1,0,0],[0,1,1,1,0],[0,0,1,0,0],[0,1,0,1,0],[0,1,0,1,0]] },
+      { emoji: '⏰', grid: [[1,1,1,1,1],[1,0,1,0,1],[1,1,1,1,1],[0,1,0,1,0],[0,1,1,1,0]] },
+      { emoji: '🔔', grid: [[0,1,0,1,0],[1,1,1,1,1],[0,1,0,1,0],[0,1,0,1,0],[0,1,0,1,0]] },
     ];
     
-    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    const selected = patterns[Math.floor(Math.random() * patterns.length)];
+    this.currentEmoji = selected.emoji;
+    const pattern = selected.grid;
     
-    // Scale pattern to requested size
     if (this.size === 5) {
       return pattern;
     }
     
-    // Scale up for larger grids (simple nearest neighbor)
+    // Scale up for larger grids
     const scale = this.size / 5;
     return Array.from({length: this.size}, (_, r) =>
       Array.from({length: this.size}, (_, c) => 
@@ -87,44 +66,17 @@ class Engine {
 
   init() {
     this.size = parseInt(this.els.diff.value);
-    this.gameMode = document.getElementById('gameMode').value;
-    this.completedRows = new Set();
-    this.completedCols = new Set();
-    
-    // Generate solution with unique solution
     this.solution = this.generatePuzzle();
-    
     this.playerBoard = Array.from({length: this.size}, () => Array(this.size).fill(0));
-    this.mistakes = 0;
     this.isGameOver = false;
     this.els.msg.textContent = "";
     this.els.msg.className = "message";
     
-    // Show/hide lives and options based on game mode
-    this.els.livesContainer.style.display = this.gameMode === 'zen' ? 'none' : 'block';
-    
-    const optionsContainer = document.querySelector('.options');
-    const autoCrossOption = document.querySelector('label:has(#autoCross)');
-    const highlightOption = document.querySelector('label:has(#highlightComplete)');
-    
-    if (this.gameMode === 'zen') {
-      if (autoCrossOption) autoCrossOption.style.display = 'none';
-      if (highlightOption) highlightOption.style.display = 'none';
-      this.autoCross = false;
-      this.highlightComplete = false;
-    } else {
-      if (autoCrossOption) autoCrossOption.style.display = 'flex';
-      if (highlightOption) highlightOption.style.display = 'flex';
-      this.autoCross = document.getElementById('autoCross').checked;
-      this.highlightComplete = document.getElementById('highlightComplete').checked;
-    }
-    
-    // Hide mode toggle button in Zen mode
-    document.getElementById('modeToggle').style.display = this.gameMode === 'zen' ? 'none' : 'flex';
+    // Show preview emoji
+    const previewEl = document.getElementById('preview');
+    if (previewEl) previewEl.textContent = this.currentEmoji || '';
     
     this.render();
-    this.updateModeButton();
-    this.updateStats();
   }
 
   getHints(arr) {
@@ -173,6 +125,8 @@ class Engine {
     // Render Grid
     this.els.grid.style.gridTemplateColumns = `repeat(${this.size}, 1fr)`;
     this.els.grid.innerHTML = "";
+    this.dragAction = null; // Track drag action
+    
     for(let r=0; r<this.size; r++) {
       for(let c=0; c<this.size; c++) {
         const cell = document.createElement('div');
@@ -180,20 +134,29 @@ class Engine {
         if ((c + 1) % 5 === 0 && c !== this.size - 1) cell.classList.add('border-right');
         if ((r + 1) % 5 === 0 && r !== this.size - 1) cell.classList.add('border-bottom');
         
-        // Use pointer events for drag support
         cell.onpointerdown = (e) => {
-          cell.releasePointerCapture(e.pointerId); 
+          cell.releasePointerCapture(e.pointerId);
+          this.startDrag(r, c);
           this.handleInput(r, c);
         };
         cell.onpointerenter = (e) => {
-          if (e.buttons === 1) this.handleInput(r, c);
+          if (e.buttons === 1 && this.dragAction !== null) {
+            this.applyDrag(r, c);
+          }
+        };
+        cell.onpointerup = () => {
+          this.dragAction = null;
         };
         
         this.els.grid.appendChild(cell);
       }
     }
     
-    // Sync column widths after grid renders
+    // Global pointerup to end drag
+    document.onpointerup = () => {
+      this.dragAction = null;
+    };
+    
     this.syncHintWidths();
   }
 
@@ -202,7 +165,6 @@ class Engine {
     const gridCols = gridStyle.gridTemplateColumns;
     const gridRows = gridStyle.gridTemplateRows;
     
-    // Only sync if we have valid values
     if (gridCols && gridCols !== 'none') {
       this.els.hTop.style.gridTemplateColumns = gridCols;
     }
@@ -211,12 +173,37 @@ class Engine {
     }
   }
 
-  handleInput(r, c) {
-    if (this.isGameOver || this.errorCooldown) return;
-    
+  startDrag(r, c) {
+    // Record the action based on starting cell state
     const current = this.playerBoard[r][c];
-    const correct = this.solution[r][c];
+    // 0 -> 1 (fill), 1 -> 2 (cross), 2 -> 0 (clear)
+    this.dragAction = current;
+  }
 
+  applyDrag(r, c) {
+    // Only apply to cells that are in the SAME state as the starting cell
+    // This protects already-set cells from being changed
+    const current = this.playerBoard[r][c];
+    
+    // Skip if cell is not in the same state as drag started
+    if (current !== this.dragAction) return;
+    
+    // Cycle to next state: empty(0)→fill(1)→cross(2)→empty(0)
+    if (current === 0) {
+      this.playerBoard[r][c] = 1;
+    } else if (current === 1) {
+      this.playerBoard[r][c] = 2;
+    } else {
+      this.playerBoard[r][c] = 0;
+    }
+    
+    this.updateCellUI(r, c);
+    this.checkWinZen();
+  }
+
+  handleInput(r, c) {
+    if (this.isGameOver) return;
+    
     // Haptic feedback
     const hapticTrigger = document.getElementById('haptic-trigger');
     if (hapticTrigger) {
@@ -225,200 +212,17 @@ class Engine {
       navigator.vibrate(10);
     }
 
-    if (this.gameMode === 'zen') {
-      // Zen mode: cycle through empty -> fill -> cross -> empty
-      const current = this.playerBoard[r][c];
-      if (current === 0) {
-        this.playerBoard[r][c] = 1; // fill
-      } else if (current === 1) {
-        this.playerBoard[r][c] = 2; // cross
-      } else {
-        this.playerBoard[r][c] = 0; // clear
-      }
-      this.updateCellUI(r, c);
-      if (this.autoCross) this.autoCrossCompletedLines(r, c);
-      else this.checkAndHighlightCompletedLines(r, c);
-      
-      // Check win only when all cells are filled
-      this.checkWinZen();
+    // Click cycles: empty -> fill -> cross -> empty
+    const current = this.playerBoard[r][c];
+    if (current === 0) {
+      this.playerBoard[r][c] = 1;
+    } else if (current === 1) {
+      this.playerBoard[r][c] = 2;
     } else {
-      // Classic mode: check correctness on each click
-      if (this.mode === 'fill') {
-        if (correct === 1) {
-          this.playerBoard[r][c] = 1;
-          this.updateCellUI(r, c);
-          if (this.autoCross) this.autoCrossCompletedLines(r, c);
-          else this.checkAndHighlightCompletedLines(r, c);
-          this.checkWin();
-        } else {
-          this.mistakes++;
-          this.playerBoard[r][c] = 2;
-          this.updateCellUI(r, c);
-          this.showErrorAnimation(r, c);
-          this.updateStats();
-          this.errorCooldown = true;
-          setTimeout(() => this.errorCooldown = false, 500);
-          if (this.mistakes >= 3) {
-            this.gameOver();
-          }
-        }
-      } else {
-        // Cross mode
-        if (correct === 1) {
-          this.mistakes++;
-          this.playerBoard[r][c] = 1;
-          this.updateCellUI(r, c);
-          this.showErrorAnimation(r, c);
-          this.updateStats();
-          this.errorCooldown = true;
-          setTimeout(() => this.errorCooldown = false, 500);
-          if (this.mistakes >= 3) {
-            this.gameOver();
-          }
-        } else {
-          this.playerBoard[r][c] = 2;
-          this.updateCellUI(r, c);
-        }
-      }
+      this.playerBoard[r][c] = 0;
     }
-  }
-
-  showErrorAnimation(r, c) {
-    const idx = r * this.size + c;
-    const el = this.els.grid.children[idx];
-    el.classList.add('error');
-    setTimeout(() => el.classList.remove('error'), 300);
-  }
-
-  gameOver() {
-    this.isGameOver = true;
-    this.els.msg.textContent = "GAME OVER";
-    this.els.msg.className = "message lose";
-    this.revealSolution();
-  }
-
-  getHintsFromSolution(line) {
-    const hints = [];
-    let count = 0;
-    for (const v of line) {
-      if (v === 1) count++;
-      else if (count > 0) { hints.push(count); count = 0; }
-    }
-    if (count > 0) hints.push(count);
-    return hints;
-  }
-
-  getPlayerHints(line) {
-    const hints = [];
-    let count = 0;
-    for (const v of line) {
-      if (v === 1) count++;
-      else if (count > 0) { hints.push(count); count = 0; }
-    }
-    if (count > 0) hints.push(count);
-    return hints.length ? hints : [0];
-  }
-
-  arraysEqual(a, b) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) return false;
-    }
-    return true;
-  }
-
-  autoCrossCompletedLines(row, col) {
-    let rowComplete = false;
-    let colComplete = false;
-
-    // Check row
-    const rowHints = this.getHintsFromSolution(this.solution[row]);
-    const playerRowHints = this.getPlayerHints(this.playerBoard[row]);
-    
-    if (this.arraysEqual(rowHints, playerRowHints) && !this.completedRows.has(row)) {
-      rowComplete = true;
-      this.completedRows.add(row);
-      for (let c = 0; c < this.size; c++) {
-        if (this.playerBoard[row][c] === 0) {
-          this.playerBoard[row][c] = 2;
-          this.updateCellUI(row, c);
-          this.addLineCompleteAnimation(row, c);
-        }
-      }
-    }
-
-    // Check column
-    const colData = this.solution.map(r => r[col]);
-    const colHints = this.getHintsFromSolution(colData);
-    
-    const playerColData = this.playerBoard.map(r => r[col]);
-    const playerColHints = this.getPlayerHints(playerColData);
-
-    if (this.arraysEqual(colHints, playerColHints) && !this.completedCols.has(col)) {
-      colComplete = true;
-      this.completedCols.add(col);
-      for (let r = 0; r < this.size; r++) {
-        if (this.playerBoard[r][col] === 0) {
-          this.playerBoard[r][col] = 2;
-          this.updateCellUI(r, col);
-          this.addLineCompleteAnimation(r, col);
-        }
-      }
-    }
-
-    // Update hint highlighting if option enabled
-    if ((rowComplete || colComplete) && this.highlightComplete) {
-      this.updateHintHighlighting();
-    }
-  }
-
-  updateHintHighlighting() {
-    // Update row hints
-    for (let r = 0; r < this.size; r++) {
-      const hintEl = this.els.hLeft.children[r];
-      if (this.completedRows.has(r)) {
-        hintEl.classList.add('complete');
-      }
-    }
-    // Update column hints
-    for (let c = 0; c < this.size; c++) {
-      const hintEl = this.els.hTop.children[c];
-      if (this.completedCols.has(c)) {
-        hintEl.classList.add('complete');
-      }
-    }
-  }
-
-  checkAndHighlightCompletedLines(row, col) {
-    if (!this.highlightComplete) return;
-
-    // Check row
-    const rowHints = this.getHintsFromSolution(this.solution[row]);
-    const playerRowHints = this.getPlayerHints(this.playerBoard[row]);
-    
-    if (this.arraysEqual(rowHints, playerRowHints) && !this.completedRows.has(row)) {
-      this.completedRows.add(row);
-      this.updateHintHighlighting();
-    }
-
-    // Check column
-    const colData = this.solution.map(r => r[col]);
-    const colHints = this.getHintsFromSolution(colData);
-    
-    const playerColData = this.playerBoard.map(r => r[col]);
-    const playerColHints = this.getPlayerHints(playerColData);
-
-    if (this.arraysEqual(colHints, playerColHints) && !this.completedCols.has(col)) {
-      this.completedCols.add(col);
-      this.updateHintHighlighting();
-    }
-  }
-
-  addLineCompleteAnimation(r, c) {
-    const idx = r * this.size + c;
-    const el = this.els.grid.children[idx];
-    el.classList.add('line-complete');
-    setTimeout(() => el.classList.remove('line-complete'), 500);
+    this.updateCellUI(r, c);
+    this.checkWinZen();
   }
 
   updateCellUI(r, c) {
@@ -430,49 +234,21 @@ class Engine {
     if (state === 1) el.classList.add('filled');
     if (state === 2) el.classList.add('crossed');
     
-    // Keep hints synced in case of resize
     this.syncHintWidths();
   }
 
-  revealSolution() {
-    this.solution.forEach((row, r) => {
-        row.forEach((val, c) => {
-            if (val === 1 && this.playerBoard[r][c] !== 1) {
-                const idx = r * this.size + c;
-                this.els.grid.children[idx].style.border = "1px solid var(--accent)";
-            }
-        });
-    });
-  }
-
-  checkWin() {
-    const won = this.solution.every((row, r) => 
-      row.every((val, c) => (val === 1 ? this.playerBoard[r][c] === 1 : true))
-    );
-    if (won) {
-      this.isGameOver = true;
-      this.els.msg.textContent = "PUZZLE SOLVED!";
-      this.els.msg.className = "message win";
-      this.playWinAnimation();
-    }
-  }
-
   checkWinZen() {
-    // Check if all cells are filled (1=filled, 2=crossed)
-    const allFilled = this.playerBoard.every(row => row.every(cell => cell !== 0));
-    if (!allFilled) return;
-    
-    // Check if solution matches
-    const correct = this.solution.every((row, r) => 
+    // Check if all filled cells in solution are correctly filled
+    const allFilled = this.solution.every((row, r) => 
       row.every((val, c) => {
         if (val === 1) return this.playerBoard[r][c] === 1;
-        return this.playerBoard[r][c] === 2;
+        return true; // Empty/crossed cells don't matter for 0s in solution
       })
     );
     
-    if (correct) {
+    if (allFilled) {
       this.isGameOver = true;
-      this.els.msg.textContent = "PUZZLE SOLVED!";
+      this.els.msg.textContent = "SOLVED!";
       this.els.msg.className = "message win";
       this.playWinAnimation();
     }
@@ -492,11 +268,6 @@ class Engine {
         }
       }
     }
-  }
-
-  updateStats() {
-    const hearts = '❤️'.repeat(3 - this.mistakes) + '🖤'.repeat(this.mistakes);
-    this.els.mistakes.textContent = hearts;
   }
 }
 
