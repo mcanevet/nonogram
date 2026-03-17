@@ -61,6 +61,7 @@ class Engine {
     
     // Only validate for 5x5 (too slow for larger grids)
     const shouldValidate = this.size <= 5;
+    const startTime = shouldValidate ? Date.now() : 0;
     
     do {
       puzzle = Array.from({length: this.size}, () => 
@@ -68,6 +69,10 @@ class Engine {
       );
       attempts++;
     } while (shouldValidate && attempts < maxAttempts && new PuzzleSolver(puzzle).countSolutions(2) > 1);
+    
+    if (shouldValidate) {
+      console.log(`Puzzle validation: ${Date.now() - startTime}ms, attempts: ${attempts}`);
+    }
     
     return puzzle;
   }
