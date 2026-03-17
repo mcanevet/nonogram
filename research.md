@@ -288,19 +288,7 @@ Custom Playwright test runner (not using a test framework).
 
 1. **No unique solution validation** - PuzzleSolver class exists but is disabled
 2. **No undo/redo** - Cannot undo moves
-3. **Random puzzles only** - No pre-designed puzzles or emoji generation yet
+3. **Random puzzles only** - No pre-designed puzzles
 4. **No statistics** - No tracking of wins/times
 5. **iOS haptics require iOS 18+** - Older iOS has no haptic feedback
 6. **release-please may fail** - GitHub Actions needs write permissions for PRs
-
-## Future Enhancements (From Plan)
-
-- [ ] Emoji-based puzzle generation (render emoji to canvas, read pixels)
-- [ ] Pre-made puzzle library
-- [ ] Daily puzzles with streaks
-- [ ] Hint system
-- [ ] Undo/redo functionality
-- [ ] Statistics tracking
-- [ ] Multiple color themes
-- [ ] Timer for speed runs
-- [ ] Save progress to localStorage
