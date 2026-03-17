@@ -57,9 +57,9 @@ class Engine {
   generatePuzzle() {
     let puzzle;
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 50;
     
-    // Only validate for 5x5 (fast enough), skip for larger
+    // Only validate for 5x5 (too slow for larger grids)
     const shouldValidate = this.size <= 5;
     
     do {
@@ -67,7 +67,7 @@ class Engine {
         Array.from({length: this.size}, () => Math.random() > 0.45 ? 1 : 0)
       );
       attempts++;
-    } while (shouldValidate && attempts < maxAttempts && new PuzzleSolver(puzzle).countSolutions(3) > 1);
+    } while (shouldValidate && attempts < maxAttempts && new PuzzleSolver(puzzle).countSolutions(2) > 1);
     
     return puzzle;
   }
@@ -490,148 +490,151 @@ class Engine {
 // Start the game
 window.game = new Engine();
 
-// Solver for unique solution validation using random solving
+// Efficient row-based solver for unique solution validation
 class PuzzleSolver {
   constructor(solution) {
     this.solution = solution;
     this.size = solution.length;
     this.rowHints = this.getHints(solution, 'row');
     this.colHints = this.getHints(solution, 'col');
-    this.startTime = Date.now();
-    this.maxTime = 50; // 50ms time limit
-    this.solutionsFound = 0;
+    this.maxSolutions = 2;
+    this.solutions = [];
+    this.maxTime = 15; // 15ms time limit
   }
 
-  // Fast probabilistic check: try to find multiple solutions
-  countSolutions(maxAttempts = 5) {
-    this.startTime = Date.now();
+  // Main entry point: returns 1 if unique, 2+ if multiple solutions
+  countSolutions(maxSolutions = 2) {
+    this.maxSolutions = maxSolutions;
+    this.solutions = [];
+    const startTime = Date.now();
     
-    // First try deterministic solving
-    if (this.solve()) {
-      this.solutionsFound = 1;
-      // Try to find a different solution with random attempts
-      for (let i = 0; i < maxAttempts; i++) {
-        if (Date.now() - this.startTime > this.maxTime) break;
-        if (this.solveRandom()) {
-          return 2; // Found multiple solutions
-        }
-      }
-      return 1; // Likely unique
-    }
-    return 0; // No solution found (invalid puzzle)
-  }
-
-  // Check time limit
-  isTimedOut() {
-    return Date.now() - this.startTime > this.maxTime;
-  }
-
-  // Fast probabilistic check: try to find multiple solutions
-  // Returns true if likely unique (no second solution found)
-  countSolutions(maxAttempts = 100) {
-    // First try deterministic solving with random start
-    if (this.solve()) {
-      // Found first solution, try to find a different one
-      for (let i = 0; i < maxAttempts; i++) {
-        if (this.solveRandom()) {
-          return 2; // Found multiple solutions
-        }
-      }
-      return 1; // Likely unique
-    }
-    return 0; // No solution found (invalid puzzle)
-  }
-
-  // Deterministic solver - fills cells greedily
-  solve() {
-    const grid = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
-    return this.solveRecursive(grid, 0, 0);
-  }
-
-  // Random solver - makes random choices when ambiguous
-  solveRandom() {
+    // Pre-compute all valid row patterns for each row
+    const rowPatterns = this.rowHints.map(hints => this.generateRowPatterns(hints, this.size));
+    
+    // Use recursive backtracking to find solutions
     const grid = Array(this.size).fill(null).map(() => Array(this.size).fill(-1));
-    return this.solveRecursiveRandom(grid, 0, 0);
+    this.solveRecursive(rowPatterns, grid, 0, () => Date.now() - startTime > this.maxTime);
+    
+    return this.solutions.length;
   }
 
-  solveRecursive(grid, row, col) {
-    if (this.isTimedOut()) return false;
-    if (row >= this.size) return this.isComplete(grid);
-
-    const nextRow = col === this.size - 1 ? row + 1 : row;
-    const nextCol = col === this.size - 1 ? 0 : col + 1;
-
-    // Try filled first, then empty (deterministic)
-    for (const value of [1, 0]) {
-      grid[row][col] = value;
-      if (this.isPartialValid(grid, row, col) && 
-          this.solveRecursive(grid, nextRow, nextCol)) {
-        return true;
-      }
-    }
-    grid[row][col] = -1;
-    return false;
-  }
-
-  solveRecursiveRandom(grid, row, col) {
-    if (this.isTimedOut()) return false;
-    if (row >= this.size) return this.isComplete(grid);
-
-    const nextRow = col === this.size - 1 ? row + 1 : row;
-    const nextCol = col === this.size - 1 ? 0 : col + 1;
-
-    // Random order for finding different solutions
-    const values = Math.random() > 0.5 ? [1, 0] : [0, 1];
-    for (const value of values) {
-      grid[row][col] = value;
-      if (this.isPartialValid(grid, row, col) && 
-          this.solveRecursiveRandom(grid, nextRow, nextCol)) {
-        return true;
-      }
-    }
-    grid[row][col] = -1;
-    return false;
-  }
-
-  isComplete(grid) {
-    for (let r = 0; r < this.size; r++) {
-      const hints = this.getLineHints(grid[r]);
-      if (!this.arraysEqual(hints, this.rowHints[r])) return false;
-    }
-    for (let c = 0; c < this.size; c++) {
-      const col = grid.map(row => row[c]);
-      const hints = this.getLineHints(col);
-      if (!this.arraysEqual(hints, this.colHints[c])) return false;
-    }
-    return true;
-  }
-
-  isPartialValid(grid, row, col) {
-    // Check all rows up to current
-    for (let r = 0; r <= row; r++) {
-      const maxCol = row === r ? col : this.size - 1;
-      const line = grid[r].slice(0, maxCol + 1);
-      if (!this.hintsMatchPartial(line, this.rowHints[r])) return false;
+  // Generate all valid row patterns that match the given hints
+  generateRowPatterns(hints, width) {
+    if (hints.length === 0) {
+      return [Array(width).fill(0)];
     }
     
-    // Check all columns up to current
-    for (let c = 0; c < this.size; c++) {
-      const maxRow = col === c ? row : (col < c ? row - 1 : row);
-      if (maxRow < 0) continue;
-      const line = grid.slice(0, maxRow + 1).map(r => r[c]);
-      if (!this.hintsMatchPartial(line, this.colHints[c])) return false;
-    }
-    return true;
+    const patterns = [];
+    const totalFilled = hints.reduce((a, b) => a + b, 0);
+    const minWidth = hints.length - 1 + totalFilled; // Minimum width with gaps
+    
+    if (minWidth > width) return [];
+    
+    // Calculate all possible starting positions for blocks
+    const generate = (hintIndex, pos, current) => {
+      if (hintIndex >= hints.length) {
+        // Fill remaining with 0s
+        while (current.length < width) current.push(0);
+        patterns.push([...current]);
+        return;
+      }
+      
+      const blockSize = hints[hintIndex];
+      const remainingBlocks = hints.length - hintIndex - 1;
+      const minRemaining = remainingBlocks > 0 ? remainingBlocks : 0;
+      const maxStart = width - blockSize - minRemaining;
+      
+      for (let start = pos; start <= maxStart; start++) {
+        // Create block
+        const block = [];
+        for (let i = 0; i < start - current.length; i++) block.push(0);
+        for (let i = 0; i < blockSize; i++) block.push(1);
+        
+        // Add gap if not last block
+        if (hintIndex < hints.length - 1) block.push(0);
+        
+        current.push(...block);
+        generate(hintIndex + 1, start + blockSize + 1, current);
+        current.length = current.length - block.length;
+      }
+    };
+    
+    generate(0, 0, []);
+    return patterns;
   }
 
-  hintsMatchPartial(line, target) {
-    const hints = this.getLineHints(line.filter(v => v !== -1));
-    if (hints.length > target.length) return false;
-    if (hints.length === target.length) {
-      for (let i = 0; i < hints.length - 1; i++) {
-        if (hints[i] !== target[i]) return false;
+  // Check if a partial grid is consistent with column hints
+  isColumnConsistent(grid, col) {
+    const colData = [];
+    for (let r = 0; r < this.size; r++) {
+      if (grid[r][col] !== -1) colData.push(grid[r][col]);
+    }
+    const hints = this.getLineHints(colData);
+    return this.hintsMatch(hints, this.colHints[col], true);
+  }
+
+  solveRecursive(rowPatterns, grid, row, isTimedOut) {
+    if (isTimedOut()) return false;
+    if (row >= this.size) {
+      // Full solution found - check all columns
+      for (let c = 0; c < this.size; c++) {
+        const colData = [];
+        for (let r = 0; r < this.size; r++) colData.push(grid[r][c]);
+        const hints = this.getLineHints(colData);
+        if (!this.arraysEqual(hints, this.colHints[c])) return false;
       }
-      if (hints.length > 0 && hints[hints.length - 1] > target[hints.length - 1]) return false;
+      // Valid solution found
+      this.solutions.push(grid.map(row => [...row]));
+      return this.solutions.length >= this.maxSolutions;
+    }
+
+    // Try each possible row pattern
+    for (const pattern of rowPatterns[row]) {
+      // Check columns incrementally
+      let consistent = true;
+      for (let c = 0; c < this.size; c++) {
+        if (pattern[c] === 1) {
+          // Check if this filled cell would violate column hints
+          const colData = [];
+          for (let r = 0; r < row; r++) colData.push(grid[r][c]);
+          colData.push(1);
+          const hints = this.getLineHints(colData);
+          if (!this.hintsMatch(hints, this.colHints[c], true)) {
+            consistent = false;
+            break;
+          }
+        }
+      }
+      
+      if (!consistent) continue;
+      
+      // Set the row
+      for (let c = 0; c < this.size; c++) {
+        grid[row][c] = pattern[c];
+      }
+      
+      if (this.solveRecursive(rowPatterns, grid, row + 1, isTimedOut)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  hintsMatch(hints, target, partial = false) {
+    if (partial) {
+      if (hints.length > target.length) return false;
+      if (hints.length === target.length) {
+        for (let i = 0; i < hints.length - 1; i++) {
+          if (hints[i] !== target[i]) return false;
+        }
+        if (hints.length > 0 && hints[hints.length - 1] > target[hints.length - 1]) return false;
+      }
+      return true;
+    }
+    if (hints.length !== target.length) return false;
+    for (let i = 0; i < hints.length; i++) {
+      if (hints[i] !== target[i]) return false;
     }
     return true;
   }
