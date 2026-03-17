@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="A nonogram/picross puzzle game">
+  <meta name="theme-color" content="#e94560">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nonogram">
+  <title>Nonogram Pro</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>NONOGRAM PRO</h1>
+    <span id="version" class="version"></span>
+  </header>
+
+  <div class="stats">
+    <div class="diff-controls">
+      <select id="diffSelect">
+        <option value="5">5x5</option>
+        <option value="10" selected>10x10</option>
+        <option value="15">15x15</option>
+        <option value="20">20x20</option>
+      </select>
+      <select id="gameMode">
+        <option value="classic">Classic</option>
+        <option value="zen" selected>Zen</option>
+      </select>
+      <button id="newGame">New Puzzle</button>
+    </div>
+    <div id="livesContainer">Lives: <span id="mistakes">❤️❤️❤️</span></div>
+  </div>
+
+  <div id="msg" class="message"></div>
+
+  <div class="game-wrapper">
+    <div class="game-layout">
+      <div class="corner"></div>
+      <div id="hintsTop" class="hints-top"></div>
+      <div id="hintsLeft" class="hints-left"></div>
+      <div id="grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div class="controls-footer">
+    <button id="modeToggle" class="mode-toggle">
+      <span class="mode-icon">●</span>
+      <span class="mode-label">FILL</span>
+    </button>
+    <div class="options">
+      <label class="option">
+        <input type="checkbox" id="autoCross" checked>
+        <span>Auto-cross</span>
+      </label>
+      <label class="option">
+        <input type="checkbox" id="highlightComplete" checked>
+        <span>Highlight complete</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<input type="checkbox" id="haptic-trigger" class="haptic">
+<label for="haptic-trigger" class="haptic-label"></label>
+
+<script src="game.js"></script>
+<script>
+  const versionEl = document.getElementById('version');
+  if (window.location.protocol === 'file:') {
+    versionEl.textContent = 'v1.0.0';
+  } else {
+    fetch('manifest.json')
+      .then(r => r.json())
+      .then(m => { versionEl.textContent = 'v' + m.version; })
+      .catch(() => { versionEl.textContent = 'v1.0.0'; });
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
