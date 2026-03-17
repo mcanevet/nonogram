@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0](https://github.com/mcanevet/nonogram/compare/v1.2.0...v1.3.0) (2026-03-17)
+
+
+### Features
+
+* generate puzzles from pre-defined emoji patterns ([fddaae7](https://github.com/mcanevet/nonogram/commit/fddaae7a4fe8eee9941ad3ba65d4c482ddb8fdc0))
+
+
+### Bug Fixes
+
+* add iOS 18+ haptic feedback support ([8cf77c2](https://github.com/mcanevet/nonogram/commit/8cf77c27fc9c43b851ec09e8344beec4b0b01f5c))
+* enable unique solution validation for 5x5 grids ([d8db569](https://github.com/mcanevet/nonogram/commit/d8db569eb5b03f6ae0837e75af902ad24db01c5a))
+* implement efficient row-based unique solution validator ([df0c383](https://github.com/mcanevet/nonogram/commit/df0c38391eaa8b5d663cb455e673b05e85b8a0a7))
+* improve unique solution validation with random solving ([ca6860f](https://github.com/mcanevet/nonogram/commit/ca6860f14dfcf09c12f73b5a0d69be93b74412b8))
+
 ## [1.2.0](https://github.com/mcanevet/nonogram/compare/v1.1.0...v1.2.0) (2026-03-16)
 
 
