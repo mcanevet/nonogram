@@ -135,6 +135,19 @@ class Engine {
     this.syncHintWidths();
   }
 
+  syncHintWidths() {
+    const gridStyle = getComputedStyle(this.els.grid);
+    const gridCols = gridStyle.gridTemplateColumns;
+    const gridRows = gridStyle.gridTemplateRows;
+    
+    if (gridCols && gridCols !== 'none') {
+      this.els.hTop.style.gridTemplateColumns = gridCols;
+    }
+    if (gridRows && gridRows !== 'none') {
+      this.els.hLeft.style.gridTemplateRows = gridRows;
+    }
+  }
+
   startDrag(r, c) {
     // Record the action based on starting cell state
     const current = this.playerBoard[r][c];
@@ -143,26 +156,24 @@ class Engine {
   }
 
   applyDrag(r, c) {
-    // Apply the same action to all dragged cells
+    // Only apply to cells that are in the SAME state as the starting cell
+    // This protects already-set cells from being changed
     const current = this.playerBoard[r][c];
     
-    // Skip if cell already has the target state from drag action
-    let target;
-    if (this.dragAction === 0) target = 1;
-    else if (this.dragAction === 1) target = 2;
-    else target = 0;
+    // Skip if cell is not in the same state as drag started
+    if (current !== this.dragAction) return;
     
-    if (current !== target) {
-      if (target === 1) {
-        this.playerBoard[r][c] = 1;
-      } else if (target === 2) {
-        this.playerBoard[r][c] = 2;
-      } else {
-        this.playerBoard[r][c] = 0;
-      }
-      this.updateCellUI(r, c);
-      this.checkWinZen();
+    // Cycle to next state: empty(0)→fill(1)→cross(2)→empty(0)
+    if (current === 0) {
+      this.playerBoard[r][c] = 1;
+    } else if (current === 1) {
+      this.playerBoard[r][c] = 2;
+    } else {
+      this.playerBoard[r][c] = 0;
     }
+    
+    this.updateCellUI(r, c);
+    this.checkWinZen();
   }
 
   handleInput(r, c) {
